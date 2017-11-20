@@ -10,6 +10,7 @@
   "license": "ISC",
   "dependencies": {
     "express": "^4.16.2",
+    "hbs": "^4.0.1",
     "mssql": "^4.1.0"
   }
 }

@@ -8,6 +8,24 @@ exports.index = function(req, res) {
 	res.send('<h1>Hello</h1>');
 }
 
+exports.apiIndex = function(req, res) {
+    var vm = {                          // vm = View Model
+        title: 'API Funktsioonid',
+        api: [
+            { name: 'Kasutajad', url: '/api/kasutajad' },         
+            { name: 'Esileht', url: '/api/esileht' },
+            { name: 'Profiil', url: '/api/profiil/cbaccup3b' },
+            { name: 'Postitus', url: '/api/postitus/19' },
+            { name: 'Üldine Statistika', url: '/api/stats' },
+            { name: 'TOP 10 enim kommeneeritud kasutajad', url: '/api/stats/top10/kommenteeritudkasutajad' },
+            { name: 'Registreerimised', url: '/api/stats/registreerimised' },
+            { name: 'Sooline jagunemine', url: '/api/stats/soolinejagunemine' }
+	    ]
+    }
+    
+    res.render('api-index', vm);
+}
+
 exports.kasutajad = function(req, res) {
     var query = 'select * from dbo.Kasutaja';
     

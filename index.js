@@ -5,8 +5,13 @@ var routes = require('./routes');
 // Instatiate application instance
 var app = express();
 
+// Lisame vaate mootori
+app.set('view engine', 'hbs');
+
 // Juur-kataloogi haldamine 
 app.get('/', routes.index);
+
+app.get('/api', routes.apiIndex);
 
 // Rakenduskesksed teekonnad
 // app.get('/api/kasutajad/:id([0-9]{1,9})?', routes.kasutajadIDJargi);
