@@ -5,14 +5,10 @@ var express = require('express');
 var app = express();
 
 // Juur-kataloogi haldamine 
-app.get('/', function(req, res) { 
-    res.send('<h1>Hello</h1>'); 
-}); 
+app.get('/', routes.index);
 
-// Vaikimisi vastus, kui muid teekondi ei leitud 
-app.get('*', function(req, res) { 
-    res.status(404).send('Invalid route'); 
-});
+// Vaikimisi vastus, kui muid teekondi ei leitud
+app.get('*', routes.default);
 
 // Initialize the server
 var server = app.listen(3000, function() {
