@@ -13,6 +13,14 @@ app.get('/', routes.index);
 // app.get('/api/kasutajad/:kasutajanimi?', routes.kasutajadKasutajanimeKaudu);
 app.get('/api/kasutajad/:id?', routes.kasutajad);
 
+app.get('/api/esileht', routes.esileht);
+app.get('/api/profiil/:id', routes.profiiliLeht);
+app.get('/api/postitus/:id', routes.postituseDetailid);
+app.get('/api/stats', routes.statistika);
+app.get('/api/stats/top10/kommenteeritudkasutajad', routes.top10KommenteeritudKasutajat);
+app.get('/api/stats/registreerimised', routes.kasutajaksRegistreerimised);
+app.get('/api/stats/soolinejagunemine', routes.soolineJagunemine);
+
 // Vaikimisi vastus, kui muid teekondi ei leitud
 app.get('*', routes.default);
 
