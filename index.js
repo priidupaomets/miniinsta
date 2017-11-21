@@ -1,9 +1,13 @@
 // Module requires
 var express = require('express');
+var logger = require('morgan');
 var routes = require('./routes');
 
 // Instatiate application instance
 var app = express();
+
+// Seadistame vahevara
+app.use(logger('dev'));
 
 // Lisame vaate mootori
 app.set('view engine', 'hbs');
