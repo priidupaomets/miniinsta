@@ -1,4 +1,5 @@
 var sql = require('./sql');
+var mssql = require('mssql');
 
 function isNumber(n) {
     return !isNaN(parseFloat(n)) && isFinite(n);
@@ -27,22 +28,26 @@ exports.apiIndex = function(req, res) {
 }
 
 exports.kasutajad = function(req, res) {
-    var query = 'select * from dbo.Kasutaja';
+    var query = 'select TOP 200 * from dbo.Kasutaja';
     
     // If there's an ID passed along
+    var params = [];
+
     if (typeof(req.params.id) !== 'undefined') {
         if (isNumber(req.params.id)) {
-            query = query.concat(' where id=' + req.params.id);
+            query = query.concat(' where id=@id');
+            params.push({ name: 'id', type: mssql.Int, value: req.params.id });
         } else {
-            query = query.concat(' where Kasutajanimi=\'' + req.params.id + '\'');            
+            query = query.concat(' where Kasutajanimi=@username');            
+            params.push({ name: 'username', type: mssql.NVarChar, value: req.params.id });
         }
     }
 
-    var result = sql.querySql(query, function(data) {
+    var result = sql.querySqlWithParams(query, params, function(data) {
         if (data !== undefined)
         {
             console.log('DATA rowsAffected: ' + data.rowsAffected);
-            res.send(data.recordset);
+            res.send(data.recordsets);
         }
     }, function(err) {
         console.log('ERROR: ' + err);
@@ -51,6 +56,12 @@ exports.kasutajad = function(req, res) {
 }
 
 exports.esileht = function(req, res) {
+    var params = [];
+
+    //if (typeof(req.params.id) !== 'undefined') {
+        params.push({ name: 'id', type: mssql.Int, value: 19 }); 
+    //}
+
     var query = 'SELECT Postitus.ID AS PostituseID, Kasutaja.Kasutajanimi, Postitus.AsukohaNimi, Postitus.Asukoht, ' +
         '    PostituseMeedia.MeediaTyypID, PostituseMeedia.MeediaFail, ' +
         '    (SELECT Count(PostituseID) FROM Meeldimine WHERE PostituseID = Postitus.ID) AS Meeldimisi ' +
@@ -58,10 +69,10 @@ exports.esileht = function(req, res) {
         '    Kasutaja ON Postitus.KasutajaID = Kasutaja.ID INNER JOIN ' +
         '    PostituseMeedia ON Postitus.ID = PostituseMeedia.PostituseID INNER JOIN ' +
         '    Jalgimine ON Kasutaja.ID = Jalgimine.JalgitavaID ' +
-        'WHERE Jalgimine.JalgijaID = 19 ' +
+        'WHERE Jalgimine.JalgijaID = @id ' +
         'ORDER BY Postitus.LisamiseAeg DESC';
     
-    var result = sql.querySql(query, function(data) {
+    var result = sql.querySqlWithParams(query, params, function(data) {
         if (data !== undefined)
         {
             console.log('DATA rowsAffected: ' + data.rowsAffected);
@@ -74,10 +85,11 @@ exports.esileht = function(req, res) {
 }
 
 exports.profiiliLeht = function(req, res) {
-    var kasutajaNimi = ''
     // If there's an ID passed along
+    var params = [];
+
     if (typeof(req.params.id) !== 'undefined') {
-        kasutajaNimi = req.params.id;           
+        params.push({ name: 'username', type: mssql.NVarChar, value: req.params.id });
     }
     
     var query = 'SELECT ID, Kasutajanimi, Website, Kirjeldus, PildiUrl, ' +
@@ -85,16 +97,16 @@ exports.profiiliLeht = function(req, res) {
     '           (SELECT Count(*) FROM dbo.Jalgimine WHERE JalgitavaID = Kasutaja.ID) AS Jalgijaid, ' +
     '           (SELECT Count(*) FROM dbo.Jalgimine WHERE JalgijaID = Kasutaja.ID) AS Jalgitavaid ' +
     '      FROM dbo.Kasutaja ' +
-    '     WHERE Kasutajanimi = \'' + kasutajaNimi + '\'' +
+    '     WHERE Kasutajanimi = @username' +
 
     '    SELECT Postitus.ID, AsukohaNimi, PostituseMeedia.MeediaTyypID, PostituseMeedia.MeediaFail' +
     '      FROM dbo.Postitus INNER JOIN' +
     '           dbo.Kasutaja ON Postitus.KasutajaID = Kasutaja.ID LEFT OUTER JOIN' +
     '           dbo.PostituseMeedia ON Postitus.ID = PostituseMeedia.PostituseID' +
-    '     WHERE Kasutajanimi = \'' + kasutajaNimi + '\'' +
+    '     WHERE Kasutajanimi = @username' +
     '     ORDER BY Postitus.LisamiseAeg DESC';
     
-    var result = sql.querySql(query, function(data) {
+    var result = sql.querySqlWithParams(query, params, function(data) {
         if (data !== undefined)
         {
             console.log('DATA rowsAffected: ' + data.rowsAffected);
@@ -114,10 +126,11 @@ exports.profiiliLeht = function(req, res) {
 }
 
 exports.postituseDetailid = function(req, res) {
-    var id = '';
     // If there's an ID passed along
+    var params = [];
+
     if (typeof(req.params.id) !== 'undefined') {
-        id = req.params.id;
+        params.push({ name: 'id', type: mssql.Int, value: req.params.id });
     }
 
     var query = 'SELECT Postitus.ID, Kasutajanimi, Kasutaja.PildiUrl, AsukohaNimi, ' +
@@ -126,22 +139,22 @@ exports.postituseDetailid = function(req, res) {
     '                  WHERE PostituseID = Postitus.ID), 0) AS Meeldimisi ' +
     '    FROM dbo.Postitus INNER JOIN ' +
     '         dbo.Kasutaja ON Postitus.KasutajaID = Kasutaja.ID ' +
-    '   WHERE Postitus.ID = ' + id +
+    '   WHERE Postitus.ID = @id' +
     '   ORDER BY Postitus.LisamiseAeg DESC' +
     
     '  SELECT PostituseMeedia.ID, PostituseMeedia.MeediaTyypID, PostituseMeedia.MeediaFail ' +
     '    FROM dbo.Postitus INNER JOIN ' +
     '         dbo.Kasutaja ON Postitus.KasutajaID = Kasutaja.ID LEFT OUTER JOIN ' +
     '         dbo.PostituseMeedia ON Postitus.ID = PostituseMeedia.PostituseID  ' +
-    '   WHERE Postitus.ID = ' + id +
+    '   WHERE Postitus.ID = @id' + 
     '   ORDER BY Postitus.LisamiseAeg DESC ' +
       
     '    SELECT ID AS KommentaariID, Kommentaar, LisamiseAeg ' +
     '      FROM Kommentaar' +
-    '     WHERE PostituseID = ' + id +
+    '     WHERE PostituseID = @id' + 
     '     ORDER BY LisamiseAeg';
 
-    var result = sql.querySql(query, function(data) {
+    var result = sql.querySqlWithParams(query, params, function(data) {
         if (data !== undefined)
         {
             console.log('DATA rowsAffected: ' + data.rowsAffected);

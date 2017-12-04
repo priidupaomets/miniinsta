@@ -55,6 +55,44 @@ exports.querySql =function(query, onData, onError) {
     }
 }
 
+exports.querySqlWithParams =function(query, params, onData, onError) {
+    try {
+        var request = pool.request();
+
+        // Kui parameetrid on kaasa antud, siis lisame need (eeldame, et on sisend-parameetrid)
+        if (typeof(params) !== 'undefined')
+        {
+            params.forEach(element => {
+                console.log('adding param ' + element.name);
+
+                request.input(element.name, element.type, element.value);
+            });
+        }
+        request
+            .query(query)
+            .then(result => {
+                // data returns:
+                //   data.recordsets.length
+                //   data.recordsets[0].length
+                //   data.recordset
+                //   data.returnValue
+                //   data.output
+                //   data.rowsAffected
+                
+                if (onData !== undefined)
+                    onData(result);
+            })
+            .catch(error => {
+                if (onError !== undefined)
+                    onError(error);
+            });
+    } catch (err) {
+        // Log errors
+        if (onError !== undefined)
+            onError(err);
+    }
+}
+
 mssql.on('error', err => {
     console.log('Error with MSSQL: ' + err);
 })
