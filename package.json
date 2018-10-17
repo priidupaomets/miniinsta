@@ -9,7 +9,7 @@
   "author": "PP",
   "license": "ISC",
   "dependencies": {
-    "express": "^4.16.2",
-    "mssql": "^4.1.0"
+    "express": "^4.16.4",
+    "mssql": "^4.2.1"
   }
 }

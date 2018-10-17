@@ -8,11 +8,11 @@ var config = {
     database: 'MiniInsta',
     
     options: {
-        encrypt: false // vaja kui Azure vms pilvebaasi külge ühendada
+        encrypt: false // when we need to connect to database in Azure cloud
     }
 }
 
-var pool; // Koht, mis salvestab yhenduse info
+var pool; // Remembed conection info
 
 (async function() {
     try {
@@ -25,7 +25,7 @@ var pool; // Koht, mis salvestab yhenduse info
     }
 })()
 
-exports.querySql =function(query, onData, onError) {
+exports.querySql = function(query, onData, onError) {
     try {
         //console.log('Getting data for: ' + query);
 

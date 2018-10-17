@@ -5,15 +5,15 @@ var routes = require('./routes');
 // Instatiate application instance
 var app = express();
 
-// Juur-kataloogi haldamine 
+// Handle URL root 
 app.get('/', routes.index);
 
-// Rakenduskesksed teekonnad
-// app.get('/api/kasutajad/:id([0-9]{1,9})?', routes.kasutajadIDJargi);
-// app.get('/api/kasutajad/:kasutajanimi?', routes.kasutajadKasutajanimeKaudu);
-app.get('/api/kasutajad/:id?', routes.kasutajad);
+// Application-specific routes
+// app.get('/api/users/:id([0-9]{1,9})?', routes.usersByID);
+// app.get('/api/users/:username?', routes.usersByUsername);
+app.get('/api/users/:id?', routes.users);
 
-// Vaikimisi vastus, kui muid teekondi ei leitud
+// Default route when nothing else was found
 app.get('*', routes.default);
 
 // Initialize the server
