@@ -2,7 +2,7 @@
 	"info": {
 		"_postman_id": "952027f9-8e24-f1f3-3cf7-fd9837201c1d",
 		"name": "MiniInsta",
-		"description": "Andmebaaside kursuse API test-rakendus",
+		"description": "Database course API test application",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
 	},
 	"item": [
