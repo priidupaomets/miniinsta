@@ -222,7 +222,7 @@ exports.top10CommentedUsers = function(req, res) {
 }
 
 exports.userRegistrations = function(req, res) {
-    var query = 'SELECT CAST(CreationTime AS Date) AS Kuupaev, Count(ID) AS Arv ' +
+    var query = 'SELECT CAST(CreationTime AS Date) AS [Date], Count(ID) AS Count ' +
     '     FROM [User] ' +
     '    GROUP BY CAST(CreationTime AS Date) ' +
     '    ORDER BY Kuupaev ';
