@@ -9,7 +9,7 @@ var config = {
     connectionTimeout: 5000,
 
     options: {
-        encrypt: false // vaja kui Azure vms pilvebaasi külge ühendada
+        encrypt: false // needed when connecting to azure managed database
     }
 }
 
