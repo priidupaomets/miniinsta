@@ -5,23 +5,23 @@ var routes = require('./routes');
 // Instatiate application instance
 var app = express();
 
-// Juur-kataloogi haldamine 
+// Handle URL root 
 app.get('/', routes.index);
 
-// Rakenduskesksed teekonnad
-// app.get('/api/kasutajad/:id([0-9]{1,9})?', routes.kasutajadIDJargi);
-// app.get('/api/kasutajad/:kasutajanimi?', routes.kasutajadKasutajanimeKaudu);
-app.get('/api/kasutajad/:id?', routes.kasutajad);
+// Application-specific routes
+// app.get('/api/users/:id([0-9]{1,9})?', routes.usersByID);
+// app.get('/api/users/:username?', routes.usersByUsername);
+app.get('/api/users/:id?', routes.users);
 
-app.get('/api/esileht', routes.esileht);
-app.get('/api/profiil/:id', routes.profiiliLeht);
-app.get('/api/postitus/:id', routes.postituseDetailid);
-app.get('/api/stats', routes.statistika);
-app.get('/api/stats/top10/kommenteeritudkasutajad', routes.top10KommenteeritudKasutajat);
-app.get('/api/stats/registreerimised', routes.kasutajaksRegistreerimised);
-app.get('/api/stats/soolinejagunemine', routes.soolineJagunemine);
+app.get('/api/frontpage', routes.frontpage);
+app.get('/api/profile/:id', routes.profilePage);
+app.get('/api/posts/:id', routes.postDetails);
+app.get('/api/stats', routes.statistics);
+app.get('/api/stats/top10/commentedusers', routes.top10CommentedUsers);
+app.get('/api/stats/registrations', routes.userRegistrations);
+app.get('/api/stats/genderdivision', routes.genderDivision);
 
-// Vaikimisi vastus, kui muid teekondi ei leitud
+// Default route when nothing else was found
 app.get('*', routes.default);
 
 // Initialize the server

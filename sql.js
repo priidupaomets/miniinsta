@@ -25,7 +25,7 @@ var pool; // Koht, mis salvestab yhenduse info
     }
 })()
 
-exports.querySql =function(query, onData, onError) {
+exports.querySql = function(query, onData, onError) {
     try {
         //console.log('Getting data for: ' + query);
 
