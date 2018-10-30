@@ -4,9 +4,10 @@ var config = {
     user: 'testapp',
     password: 'testapp',
     server: '127.0.0.1\\sqlexpress',
-    port: 1433,
+    //port: 1433, // Should not set this when connecting to a named instance
     database: 'MiniInsta',
-    
+    connectionTimeout: 5000,
+
     options: {
         encrypt: false // vaja kui Azure vms pilvebaasi külge ühendada
     }
