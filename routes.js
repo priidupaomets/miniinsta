@@ -6,7 +6,7 @@ function isNumber(n) {
 
 exports.index = function(req, res) {
 	res.send('<h1>Hello</h1>');
-}
+};
 
 exports.apiIndex = function(req, res) {
     var vm = {                          // vm = View Model
@@ -21,10 +21,10 @@ exports.apiIndex = function(req, res) {
             { name: 'Registrations', url: '/api/stats/userregistrations' },
             { name: 'Gender Division', url: '/api/stats/genderdivision' }
 	    ]
-    }
+    };
     
     res.render('api-index', vm);
-}
+};
 
 
 exports.users = function(req, res) {
@@ -49,7 +49,7 @@ exports.users = function(req, res) {
         console.log('ERROR: ' + err);
         res.status(500).send('ERROR: ' + err);
     });
-}
+};
 
 exports.frontpage = function(req, res) {
     var query = 'SELECT Post.ID AS PostID, [User].Username, ' +
@@ -72,7 +72,7 @@ exports.frontpage = function(req, res) {
         console.log('ERROR: ' + err);
         res.status(500).send('ERROR: ' + err);
     });
-}
+};
 
 exports.profilePage = function(req, res) {
     var username = '';
@@ -117,7 +117,7 @@ exports.profilePage = function(req, res) {
         console.log('ERROR: ' + err);
         res.status(500).send('ERROR: ' + err);
     });
-}
+};
 
 exports.postDetails = function(req, res) {
     var id = '';
@@ -169,7 +169,7 @@ exports.postDetails = function(req, res) {
         console.log('ERROR: ' + err);
         res.status(500).send('ERROR: ' + err);
     });
-}
+};
 
 exports.statistics = function(req, res) {
     var query = 'SELECT ' +
@@ -198,7 +198,7 @@ exports.statistics = function(req, res) {
         console.log('ERROR: ' + err);
         res.status(500).send('ERROR: ' + err);
     });
-}
+};
 
 
 exports.top10CommentedUsers = function(req, res) {
@@ -219,13 +219,13 @@ exports.top10CommentedUsers = function(req, res) {
         console.log('ERROR: ' + err);
         res.status(500).send('ERROR: ' + err);
     });
-}
+};
 
 exports.userRegistrations = function(req, res) {
     var query = 'SELECT CAST(CreationTime AS Date) AS [Date], Count(ID) AS Count ' +
     '     FROM [User] ' +
     '    GROUP BY CAST(CreationTime AS Date) ' +
-    '    ORDER BY Kuupaev ';
+    '    ORDER BY [Date] ';
     
     var result = sql.querySql(query, function(data) {
         if (data !== undefined)
@@ -237,7 +237,7 @@ exports.userRegistrations = function(req, res) {
         console.log('ERROR: ' + err);
         res.status(500).send('ERROR: ' + err);
     });
-}
+};
 
 exports.genderDivision = function(req, res) {
     var query = 'SELECT Gender.Name AS Gender, Count([User].ID) AS Users ' +
@@ -255,8 +255,8 @@ exports.genderDivision = function(req, res) {
         console.log('ERROR: ' + err);
         res.status(500).send('ERROR: ' + err);
     });
-}
+};
 
 exports.default = function(req, res) {
 	res.status(404).send('Invalid route');
-}
+};
