@@ -18,7 +18,7 @@ exports.apiIndex = function(req, res) {
             { name: 'Post', url: '/api/post/19' },
             { name: 'General Statistics', url: '/api/stats' },
             { name: 'TOP 10 Most Commented Users', url: '/api/stats/top10/commentedusers' },
-            { name: 'Registrations', url: '/api/stats/userregistrations' },
+            { name: 'Registrations', url: '/api/stats/registrations' },
             { name: 'Gender Division', url: '/api/stats/genderdivision' }
 	    ]
     };
