@@ -11,39 +11,127 @@ exports.index = function(req, res) {
 
 exports.apiIndex = function(req, res) {
     var vm = {                          // vm = View Model
-        title: 'API Funktsioonid',
+        title: 'API Functions',
         api: [
-            { name: 'Kasutajad', url: '/api/kasutajad' },         
-            { name: 'Esileht', url: '/api/esileht' },
-            { name: 'Profiil', url: '/api/profiil/cbaccup3b' },
-            { name: 'Postitus', url: '/api/postitus/19' },
-            { name: 'Üldine Statistika', url: '/api/stats' },
-            { name: 'TOP 10 enim kommeneeritud kasutajad', url: '/api/stats/top10/kommenteeritudkasutajad' },
-            { name: 'Registreerimised', url: '/api/stats/registreerimised' },
-            { name: 'Sooline jagunemine', url: '/api/stats/soolinejagunemine' }
-	    ]
-    }
+            { name: 'Users', url: '/api/users?pagesize=20&page=2' },         
+            { name: 'User by ID', url: '/api/users/121' },         
+            { name: 'User by Username', url: '/api/users/cbaccup3b' },         
+            { name: 'User by Username (Insecure)', url: '/api/users_insecure/cbaccup3b' },         
+            { name: 'Front Page', url: '/api/frontpage' },
+            { name: 'Profile Page', url: '/api/profile/cbaccup3b' },
+            { name: 'Post', url: '/api/posts/19' },
+            { name: 'General Statistics', url: '/api/stats' },
+            { name: 'TOP 10 Most Commented Users', url: '/api/stats/top10/commentedusers' },
+            { name: 'User Registrations', url: '/api/stats/registrations' },
+            { name: 'Gender Division', url: '/api/stats/genderdivision' }
+        ],
+        injections: [
+            { name: 'Basic test (Insecure)', url: '/api/users_insecure/kala\' or 1=1 --'},
+            { name: 'Basic test (Secure)', url: '/api/users/kala\' or 1=1 --'},
+            { name: 'Alternate Query (Insecure)', url: '/api/users_insecure/kala\' or 1=0; select * from MediaType --'},
+            { name: 'Alternate Query (Secure)', url: '/api/users/kala\' or 1=0; select * from MediaType --'},
+        ]
+    };
     
     res.render('api-index', vm);
+};
+
+function paginate(query, params, req) {
+    let pagesize = 50;
+    let page = 1;
+
+    if (typeof(req.query.pagesize) !== 'undefined') {
+        pagesize = parseInt(req.query.pagesize, 10);
+
+        if (pagesize <= 0) {
+            pageSize = 10;
+        }
+    }
+
+    if (typeof(req.query.page) !== 'undefined') {
+        page = parseInt(req.query.page, 10);
+
+        if (page <= 0) {
+            page = 1;
+        }
+    }
+
+    params.push({ name: 'pagesize', type: mssql.Int, value: pagesize });
+    params.push({ name: 'page', type: mssql.Int, value: page });
+
+    query = query.concat(' OFFSET @pagesize * (@page - 1) ROWS ' +
+                         ' FETCH NEXT @pagesize ROWS ONLY');
+
+    return query;
 }
 
-exports.kasutajad = function(req, res) {
+exports.usersInsecure = function(req, res) {
+    var query = 'select * from dbo.[User] ';
+    
+     // If there's an ID passed along
+     if (typeof(req.params.id) !== 'undefined') {
+        if (isNumber(req.params.id)) {
+            query = query.concat(' where id=' + req.params.id);
+        } else {
+            query = query.concat(' where Username=\'' + req.params.id + '\'');            
+        }
+    }
+    else {
+        // Paginate requires order by
+        query = query.concat(' order by id');
+
+        query = paginate(query, params, req);
+    }
+
+    var result = sql.querySql(query, function(data) {
+        if (data !== undefined)
+        {
+            console.log('DATA rowsAffected: ' + data.rowsAffected);
+            res.send(data.recordsets); // Return all recordsets for testing purposes
+        }
+    }, function(err) {
+        console.log('ERROR: ' + err);
+        res.status(500).send('ERROR: ' + err);
+    });
+}
+
+exports.users = function(req, res) {
+
     var procedureName = '';
     
     // If there's an ID passed along
     var params = [];
+    let pagesize = 50;
+    let page = 1;
+
+    if (typeof(req.query.pagesize) !== 'undefined') {
+        pagesize = parseInt(req.query.pagesize, 10);
+
+        if (pagesize <= 0) {
+            pageSize = 10;
+        }
+    }
+
+    if (typeof(req.query.page) !== 'undefined') {
+        page = parseInt(req.query.page, 10);
+
+        if (page <= 0) {
+            page = 1;
+        }
+    }
 
     if (typeof(req.params.id) !== 'undefined') {
         if (isNumber(req.params.id)) {
-            procedureName = 'TagastaKasutajadIDJargi';
+            procedureName = 'GetUserByID';
             params.push({ name: 'ID', type: mssql.Int, value: req.params.id });
         } else {
-            procedureName = 'TagastaKasutajadKasutajanimeJargi';
-            params.push({ name: 'Kasutajanimi', type: mssql.NVarChar, value: req.params.id });
+            procedureName = 'GetUserByUsername';
+            params.push({ name: 'Username', type: mssql.NVarChar, value: req.params.id });
         }
-    } else { // Kui ei ID-d ega kasutajanime polnud antud
-        procedureName = 'TagastaKasutajadIDJargi';
-        params.push({ name: 'ID', type: mssql.Int, value: 0 });
+    } else { // When ID nor Username has not been specified
+        procedureName = 'GetUsers';
+        params.push({ name: 'Page', type: mssql.Int, value: page });
+        params.push({ name: 'PageSize', type: mssql.Int, value: pagesize });
     }
 
     var result = sql.execute(procedureName, params, function(data) {
@@ -58,14 +146,14 @@ exports.kasutajad = function(req, res) {
     });
 }
 
-exports.esileht = function(req, res) {
+exports.frontpage = function(req, res) {
     var params = [];
 
     //if (typeof(req.params.id) !== 'undefined') {
-        params.push({ name: 'KasutajaID', type: mssql.Int, value: 19 }); 
+        params.push({ name: 'UserID', type: mssql.Int, value: 19 }); 
     //}
 
-    var procedureName = 'TagastaEsileheAndmed';
+    var procedureName = 'GetFrontPageData';
     
     var result = sql.execute(procedureName, params, function(data) {
         if (data !== undefined)
@@ -79,17 +167,17 @@ exports.esileht = function(req, res) {
     });
 }
 
-exports.profiiliLeht = function(req, res) {
+exports.profilePage = function(req, res) {
     // If there's an ID passed along
     var params = [];
 
     if (typeof(req.params.id) !== 'undefined') {
-        params.push({ name: 'Kasutajanimi', type: mssql.NVarChar, value: req.params.id });
+        params.push({ name: 'Username', type: mssql.NVarChar, value: req.params.id });
     } else {
-        params.push({ name: 'Kasutajanimi', type: mssql.NVarChar, value: '' });        
+        params.push({ name: 'Username', type: mssql.NVarChar, value: '' });        
     }
     
-    var procedureName = 'TagastaProfiilKasutajanimeJargi';
+    var procedureName = 'GetProfilePageDataByUsername';
     
     var result = sql.execute(procedureName, params, function(data) {
         if (data !== undefined)
@@ -99,7 +187,7 @@ exports.profiiliLeht = function(req, res) {
             if (data.recordsets.length > 1) {
                 var posts = data.recordsets[1];
 
-                profile.postitused = posts;
+                profile.posts = posts;
             }
             
             res.send(profile);
@@ -110,36 +198,36 @@ exports.profiiliLeht = function(req, res) {
     });
 }
 
-exports.postituseDetailid = function(req, res) {
+exports.postDetails = function(req, res) {
     // If there's an ID passed along
     var params = [];
 
     if (typeof(req.params.id) !== 'undefined') {
-        params.push({ name: 'PostituseID', type: mssql.Int, value: req.params.id });
+        params.push({ name: 'PostID', type: mssql.Int, value: req.params.id });
     } else {
-        params.push({ name: 'PostituseID', type: mssql.Int, value: 0 });        
+        params.push({ name: 'PostID', type: mssql.Int, value: 0 });        
     }
 
-    var procedureName = 'TagastaPostituseDetailid';
+    var procedureName = 'GetPostDetailData';
 
     var result = sql.execute(procedureName, params, function(data) {
         if (data !== undefined)
         {
             console.log('DATA rowsAffected: ' + data.rowsAffected);
 
-            var postitus = data.recordsets[0][0];
+            var post = data.recordsets[0][0];
             if (data.recordsets.length > 1) {
-                var meedia = data.recordsets[1];
+                var media = data.recordsets[1];
 
-                postitus.meedia = meedia;
+                post.media = media;
             }
             if (data.recordsets.length > 2) {
-                var kommentaarid = data.recordsets[2];
+                var comments = data.recordsets[2];
 
-                postitus.kommentaarid = kommentaarid;
+                post.comments = comments;
             }
             
-            res.send(postitus);
+            res.send(post);
         }
     }, function(err) {
         console.log('ERROR: ' + err);
@@ -147,8 +235,8 @@ exports.postituseDetailid = function(req, res) {
     });
 }
 
-exports.statistika = function(req, res) {
-    var procedureName = 'TagastaStatistika';
+exports.statistics = function(req, res) {
+    var procedureName = 'GetStatisticalData';
     
     var result = sql.execute(procedureName, undefined, function(data) {
         if (data !== undefined)
@@ -163,8 +251,8 @@ exports.statistika = function(req, res) {
 }
 
 
-exports.top10KommenteeritudKasutajat = function(req, res) {
-    var procedureName = 'TagastaTop10KommenteeritudKasutajat';
+exports.top10CommentedUsers = function(req, res) {
+    var procedureName = 'GetTop10CommentedUsers';
     
     var result = sql.execute(procedureName, undefined, function(data) {
         if (data !== undefined)
@@ -178,8 +266,8 @@ exports.top10KommenteeritudKasutajat = function(req, res) {
     });
 }
 
-exports.kasutajaksRegistreerimised = function(req, res) {
-    var procedureName = 'TagastaKasutajaksRegistreerimiseHulgadKuupaevaKaupa';
+exports.userRegistrations = function(req, res) {
+    var procedureName = 'GetUserRegistrationsHistogramData';
     
     var result = sql.execute(procedureName, undefined, function(data) {
         if (data !== undefined)
@@ -193,8 +281,8 @@ exports.kasutajaksRegistreerimised = function(req, res) {
     });
 }
 
-exports.soolineJagunemine = function(req, res) {
-    var procedureName = 'TagastaKasutajateSoolineJagunemine';
+exports.genderDivision = function(req, res) {
+    var procedureName = 'GetGenderDivisionData';
     
     var result = sql.execute(procedureName, undefined, function(data) {
         if (data !== undefined)
