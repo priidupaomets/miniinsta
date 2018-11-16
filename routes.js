@@ -36,29 +36,24 @@ exports.apiIndex = function(req, res) {
     res.render('api-index', vm);
 };
 
-function paginateWithRequest(query, params, req) {
+function paginate(query, params, req) {
     let pagesize = 50;
     let page = 1;
 
     if (typeof(req.query.pagesize) !== 'undefined') {
         pagesize = parseInt(req.query.pagesize, 10);
+
+        if (pagesize <= 0) {
+            pageSize = 10;
+        }
     }
 
     if (typeof(req.query.page) !== 'undefined') {
         page = parseInt(req.query.page, 10);
-    }
 
-    return paginate(query, params, pagesize, page);
-}
-
-function paginate(query, params, pagesize = 50, page = 1) {
-
-    if (pagesize <= 0) {
-        pageSize = 10;
-    }
-
-    if (page <= 0) {
-        page = 1;
+        if (page <= 0) {
+            page = 1;
+        }
     }
 
     params.push({ name: 'pagesize', type: mssql.Int, value: pagesize });
@@ -80,6 +75,12 @@ exports.usersInsecure = function(req, res) {
         } else {
             query = query.concat(' where Username=\'' + req.params.id + '\'');            
         }
+    }
+    else {
+        // Paginate requires order by
+        query = query.concat(' order by id');
+
+        query = paginate(query, params, req);
     }
 
     var result = sql.querySql(query, function(data) {
@@ -113,7 +114,7 @@ exports.users = function(req, res) {
         // Paginate requires order by
         query = query.concat(' order by id');
 
-        query = paginateWithRequest(query, params, req);
+        query = paginate(query, params, req);
     }
 
     var result = sql.querySqlWithParams(query, params, function(data) {
