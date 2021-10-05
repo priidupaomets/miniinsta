@@ -1,8 +1,9 @@
 // Module requires
-var express = require('express');
+let express = require('express');
+let routes = require('./routes');
 
 // Instatiate application instance
-var app = express();
+let app = express();
 
 // Juur-kataloogi haldamine 
 app.get('/', routes.index);
@@ -11,6 +12,6 @@ app.get('/', routes.index);
 app.get('*', routes.default);
 
 // Initialize the server
-var server = app.listen(3000, function() {
+let server = app.listen(3000, function() {
     console.log('Listening on port 3000');
 });
