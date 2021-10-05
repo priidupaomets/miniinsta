@@ -1,5 +1,5 @@
-var sql = require('./sql');
-var mssql = require('mssql');
+let sql = require('./sql');
+let mssql = require('mssql');
 
 function isNumber(n) {
     return !isNaN(parseFloat(n)) && isFinite(n);
@@ -7,10 +7,10 @@ function isNumber(n) {
 
 exports.index = function(req, res) {
 	res.send('<h1>Hello</h1>');
-}
+};
 
 exports.apiIndex = function(req, res) {
-    var vm = {                          // vm = View Model
+    let vm = {                          // vm = View Model
         title: 'API Functions',
         api: [
             { name: 'Users', url: '/api/users?pagesize=20&page=2' },         
@@ -66,7 +66,7 @@ function paginate(query, params, req) {
 }
 
 exports.usersInsecure = function(req, res) {
-    var query = 'select * from dbo.[User] ';
+    let query = 'select * from dbo.[User] ';
     
      // If there's an ID passed along
      if (typeof(req.params.id) !== 'undefined') {
@@ -83,7 +83,7 @@ exports.usersInsecure = function(req, res) {
         query = paginate(query, params, req);
     }
 
-    var result = sql.querySql(query, function(data) {
+    let result = sql.querySql(query, function(data) {
         if (data !== undefined)
         {
             console.log('DATA rowsAffected: ' + data.rowsAffected);
@@ -93,14 +93,14 @@ exports.usersInsecure = function(req, res) {
         console.log('ERROR: ' + err);
         res.status(500).send('ERROR: ' + err);
     });
-}
+};
 
 exports.users = function(req, res) {
 
-    var procedureName = '';
+    let procedureName = '';
     
     // If there's an ID passed along
-    var params = [];
+    let params = [];
     let pagesize = 50;
     let page = 1;
 
@@ -134,7 +134,7 @@ exports.users = function(req, res) {
         params.push({ name: 'PageSize', type: mssql.Int, value: pagesize });
     }
 
-    var result = sql.execute(procedureName, params, function(data) {
+    let result = sql.execute(procedureName, params, function(data) {
         if (data !== undefined)
         {
             console.log('DATA rowsAffected: ' + data.rowsAffected);
@@ -144,18 +144,18 @@ exports.users = function(req, res) {
         console.log('ERROR: ' + err);
         res.status(500).send('ERROR: ' + err);
     });
-}
+};
 
 exports.frontpage = function(req, res) {
-    var params = [];
+    let params = [];
 
     //if (typeof(req.params.id) !== 'undefined') {
         params.push({ name: 'UserID', type: mssql.Int, value: 19 }); 
     //}
 
-    var procedureName = 'GetFrontPageData';
+    let procedureName = 'GetFrontPageData';
     
-    var result = sql.execute(procedureName, params, function(data) {
+    let result = sql.execute(procedureName, params, function(data) {
         if (data !== undefined)
         {
             console.log('DATA rowsAffected: ' + data.rowsAffected);
@@ -165,11 +165,11 @@ exports.frontpage = function(req, res) {
         console.log('ERROR: ' + err);
         res.status(500).send('ERROR: ' + err);
     });
-}
+};
 
 exports.profilePage = function(req, res) {
     // If there's an ID passed along
-    var params = [];
+    let params = [];
 
     if (typeof(req.params.id) !== 'undefined') {
         params.push({ name: 'Username', type: mssql.NVarChar, value: req.params.id });
@@ -177,15 +177,16 @@ exports.profilePage = function(req, res) {
         params.push({ name: 'Username', type: mssql.NVarChar, value: '' });        
     }
     
-    var procedureName = 'GetProfilePageDataByUsername';
+    let procedureName = 'GetProfilePageDataByUsername';
     
-    var result = sql.execute(procedureName, params, function(data) {
+    let result = sql.execute(procedureName, params, function(data) {
         if (data !== undefined)
         {
             console.log('DATA rowsAffected: ' + data.rowsAffected);
-            var profile = data.recordsets[0][0];
+
+            let profile = data.recordsets[0][0];
             if (data.recordsets.length > 1) {
-                var posts = data.recordsets[1];
+                let posts = data.recordsets[1];
 
                 profile.posts = posts;
             }
@@ -196,11 +197,11 @@ exports.profilePage = function(req, res) {
         console.log('ERROR: ' + err);
         res.status(500).send('ERROR: ' + err);
     });
-}
+};
 
 exports.postDetails = function(req, res) {
     // If there's an ID passed along
-    var params = [];
+    let params = [];
 
     if (typeof(req.params.id) !== 'undefined') {
         params.push({ name: 'PostID', type: mssql.Int, value: req.params.id });
@@ -208,21 +209,21 @@ exports.postDetails = function(req, res) {
         params.push({ name: 'PostID', type: mssql.Int, value: 0 });        
     }
 
-    var procedureName = 'GetPostDetailData';
+    let procedureName = 'GetPostDetailData';
 
-    var result = sql.execute(procedureName, params, function(data) {
+    let result = sql.execute(procedureName, params, function(data) {
         if (data !== undefined)
         {
             console.log('DATA rowsAffected: ' + data.rowsAffected);
 
-            var post = data.recordsets[0][0];
+            let post = data.recordsets[0][0];
             if (data.recordsets.length > 1) {
-                var media = data.recordsets[1];
+                let media = data.recordsets[1];
 
                 post.media = media;
             }
             if (data.recordsets.length > 2) {
-                var comments = data.recordsets[2];
+                let comments = data.recordsets[2];
 
                 post.comments = comments;
             }
@@ -233,12 +234,12 @@ exports.postDetails = function(req, res) {
         console.log('ERROR: ' + err);
         res.status(500).send('ERROR: ' + err);
     });
-}
+};
 
 exports.statistics = function(req, res) {
-    var procedureName = 'GetStatisticalData';
+    let procedureName = 'GetStatisticalData';
     
-    var result = sql.execute(procedureName, undefined, function(data) {
+    let result = sql.execute(procedureName, undefined, function(data) {
         if (data !== undefined)
         {
             console.log('DATA rowsAffected: ' + data.rowsAffected);
@@ -248,13 +249,13 @@ exports.statistics = function(req, res) {
         console.log('ERROR: ' + err);
         res.status(500).send('ERROR: ' + err);
     });
-}
+};
 
 
 exports.top10CommentedUsers = function(req, res) {
-    var procedureName = 'GetTop10CommentedUsers';
+    let procedureName = 'GetTop10CommentedUsers';
     
-    var result = sql.execute(procedureName, undefined, function(data) {
+    let result = sql.execute(procedureName, undefined, function(data) {
         if (data !== undefined)
         {
             console.log('DATA rowsAffected: ' + data.rowsAffected);
@@ -264,12 +265,12 @@ exports.top10CommentedUsers = function(req, res) {
         console.log('ERROR: ' + err);
         res.status(500).send('ERROR: ' + err);
     });
-}
+};
 
 exports.userRegistrations = function(req, res) {
-    var procedureName = 'GetUserRegistrationsHistogramData';
+    let procedureName = 'GetUserRegistrationsHistogramData';
     
-    var result = sql.execute(procedureName, undefined, function(data) {
+    let result = sql.execute(procedureName, undefined, function(data) {
         if (data !== undefined)
         {
             console.log('DATA rowsAffected: ' + data.rowsAffected);
@@ -279,12 +280,12 @@ exports.userRegistrations = function(req, res) {
         console.log('ERROR: ' + err);
         res.status(500).send('ERROR: ' + err);
     });
-}
+};
 
 exports.genderDivision = function(req, res) {
-    var procedureName = 'GetGenderDivisionData';
+    let procedureName = 'GetGenderDivisionData';
     
-    var result = sql.execute(procedureName, undefined, function(data) {
+    let result = sql.execute(procedureName, undefined, function(data) {
         if (data !== undefined)
         {
             console.log('DATA rowsAffected: ' + data.rowsAffected);
@@ -294,8 +295,8 @@ exports.genderDivision = function(req, res) {
         console.log('ERROR: ' + err);
         res.status(500).send('ERROR: ' + err);
     });
-}
+};
 
 exports.default = function(req, res) {
 	res.status(404).send('Invalid route');
-}
+};
