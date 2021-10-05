@@ -35,7 +35,7 @@ exports.users = function(req, res) {
 exports.frontpage = function(req, res) {
     let query = `SELECT Post.ID AS PostID, [User].Username, 
         PostMedia.MediaTypeID, PostMedia.MediaFileUrl, Post.CreationTime,
-        (SELECT Count(PostID) FROM [Like] WHERE PostID = Post.ID) AS Likes 
+        (SELECT Count(PostID) FROM [Liking] WHERE PostID = Post.ID) AS Likes 
      FROM Post INNER JOIN 
         [User] ON Post.UserID = [User].ID INNER JOIN 
         PostMedia ON Post.ID = PostMedia.PostID INNER JOIN 
@@ -109,7 +109,7 @@ exports.postDetails = function(req, res) {
 
     let query = `SELECT Post.ID, Username, [User].ImageUrl, LocationName, Location,
          IsNull((SELECT Count(PostID) 
-                   FROM dbo.[Like] 
+                   FROM dbo.[Liking] 
                   WHERE PostID = Post.ID), 0) AS Likes 
        FROM dbo.Post INNER JOIN 
             dbo.[User] ON Post.UserID = [User].ID 
@@ -165,9 +165,9 @@ exports.statistics = function(req, res) {
          (SELECT Max(CommentCount) 
             FROM (SELECT PostID, Count(ID) AS CommentCount FROM Comment GROUP BY PostID) CommentsPerPost) AS MaxCommentsPerPost,
          (SELECT Avg(LikeCount) 
-            FROM (SELECT PostID, Count(PostID) AS LikeCount FROM [Like] GROUP BY PostID) LikesPerPost) AS AvgLikesPerPost,
+            FROM (SELECT PostID, Count(PostID) AS LikeCount FROM [Liking] GROUP BY PostID) LikesPerPost) AS AvgLikesPerPost,
          (SELECT Max(LikeCount) 
-            FROM (SELECT PostID, Count(PostID) AS LikeCount FROM [Like] GROUP BY PostID) LikesPerPost) AS MaxLIkesPerPost`;
+            FROM (SELECT PostID, Count(PostID) AS LikeCount FROM [Liking] GROUP BY PostID) LikesPerPost) AS MaxLIkesPerPost`;
     
     let result = sql.querySql(query, function(data) {
         if (data !== undefined)
