@@ -1,9 +1,9 @@
 // Module requires
-var express = require('express');
-var routes = require('./routes');
+let express = require('express');
+let routes = require('./routes');
 
 // Instatiate application instance
-var app = express();
+let app = express();
 
 // Handle URL root 
 app.get('/', routes.index);
@@ -25,6 +25,6 @@ app.get('/api/stats/genderdivision', routes.genderDivision);
 app.get('*', routes.default);
 
 // Initialize the server
-var server = app.listen(3000, function() {
+let server = app.listen(3000, function() {
     console.log('Listening on port 3000');
 });
