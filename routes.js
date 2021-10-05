@@ -203,10 +203,10 @@ exports.top10CommentedUsers = function(req, res) {
 };
 
 exports.userRegistrations = function(req, res) {
-    let query = `SELECT CAST(CreationTime AS Date) AS Kuupaev, Count(ID) AS Arv 
+    let query = `SELECT CAST(CreationTime AS Date) AS [Date], Count(ID) AS Count 
          FROM [User] 
         GROUP BY CAST(CreationTime AS Date) 
-        ORDER BY Kuupaev`;
+        ORDER BY [Date]`;
     
     let result = sql.querySql(query, function(data) {
         if (data !== undefined)
