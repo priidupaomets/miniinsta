@@ -1,6 +1,6 @@
 var mssql = require('mssql');
 
-var config = {
+let config = {
     user: 'testapp',
     password: 'testapp',
     server: '127.0.0.1\\sqlexpress',
@@ -11,9 +11,9 @@ var config = {
     options: {
         encrypt: false // needed when connecting to azure managed database
     }
-}
+};
 
-var pool; // Koht, mis salvestab yhenduse info
+let pool; // Koht, mis salvestab yhenduse info
 
 (async function() {
     try {
@@ -24,7 +24,7 @@ var pool; // Koht, mis salvestab yhenduse info
         // Log errors
         console.log('ERROR: ' + err);
     }
-})()
+})();
 
 exports.querySql = function(query, onData, onError) {
     try {
@@ -54,8 +54,8 @@ exports.querySql = function(query, onData, onError) {
         if (onError !== undefined)
             onError(err);
     }
-}
+};
 
 mssql.on('error', err => {
     console.log('Error with MSSQL: ' + err);
-})
+});

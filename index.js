@@ -1,10 +1,10 @@
 // Module requires
-var express = require('express');
-var logger = require('morgan');
-var routes = require('./routes');
+let express = require('express');
+let logger = require('morgan');
+let routes = require('./routes');
 
 // Instatiate application instance
-var app = express();
+let app = express();
 
 // Configure the middleware - in this case Morgan Logger
 app.use(logger('dev'));
@@ -34,6 +34,6 @@ app.get('/api/stats/genderdivision', routes.genderDivision);
 app.get('*', routes.default);
 
 // Initialize the server
-var server = app.listen(3000, function() {
+let server = app.listen(3000, function() {
     console.log('Listening on port 3000');
 });
