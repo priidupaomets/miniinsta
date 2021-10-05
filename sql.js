@@ -1,6 +1,6 @@
-var mssql = require('mssql');
+let mssql = require('mssql');
 
-var config = {
+let config = {
     user: 'testapp',
     password: 'testapp',
     server: '127.0.0.1\\sqlexpress',
@@ -10,9 +10,9 @@ var config = {
     options: {
         encrypt: false // when we need to connect to database in Azure cloud
     }
-}
+};
 
-var pool; // Remembed conection info
+let pool; // Remembed conection info
 
 (async function() {
     try {
@@ -23,7 +23,7 @@ var pool; // Remembed conection info
         // Log errors
         console.log('ERROR: ' + err);
     }
-})()
+})();
 
 exports.querySql = function(query, onData, onError) {
     try {
@@ -53,8 +53,8 @@ exports.querySql = function(query, onData, onError) {
         if (onError !== undefined)
             onError(err);
     }
-}
+};
 
 mssql.on('error', err => {
     console.log('Error with MSSQL: ' + err);
-})
+});
